@@ -12,15 +12,19 @@ app.use(express.json())
 
 // console.log(process.env.DB_USER, process.env.DB_PASS)
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.h2fzsvj.mongodb.net/?retryWrites=true&w=majority`;
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
+const uri = 'mongodb://0.0.0.0:27017/'
+const client = new MongoClient(uri)
+
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.h2fzsvj.mongodb.net/?retryWrites=true&w=majority`;
+// // Create a MongoClient with a MongoClientOptions object to set the Stable API version
+// const client = new MongoClient(uri, {
+//   serverApi: {
+//     version: ServerApiVersion.v1,
+//     strict: true,
+//     deprecationErrors: true,
+//   }
+// });
+
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
@@ -31,6 +35,11 @@ async function run() {
     app.get('/products', async(req, res) => {
         const result = await productCollection.find().toArray()
         res.send(result)
+    })
+
+    app.get('/total-products', async(req, res) => {
+        const result = await productCollection.estimatedDocumentCount()
+        res.send({totalProducts: result})
     })
 
     // Send a ping to confirm a successful connection
