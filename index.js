@@ -1,6 +1,6 @@
 const express = require('express')
 const cors = require('cors')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 
 const app = express()
@@ -37,7 +37,7 @@ async function run() {
         const page = parseInt(req.query.page) || 0;
         const size = parseInt(req.query.size) || 10;
         const skip = page * size;
-        
+
         const result = await productCollection.find().skip(skip).limit(size).toArray()
         res.send(result)
     })
@@ -45,6 +45,14 @@ async function run() {
     app.get('/total-products', async(req, res) => {
         const result = await productCollection.estimatedDocumentCount()
         res.send({totalProducts: result})
+    })
+
+    app.post('/products-by-ids', async(req, res) => {
+        const ids = req.body;
+        const objectIds = ids.map(id => new ObjectId(id));
+
+        const result = await productCollection.find({_id: { $in: objectIds }}).toArray()
+        res.send(result)
     })
 
     // Send a ping to confirm a successful connection
